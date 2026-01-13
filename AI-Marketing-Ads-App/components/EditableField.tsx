@@ -13,6 +13,7 @@ interface EditableFieldProps {
   fieldType: FieldType;
   platform: Platform;
   fieldLabel: string;
+  charCount?: number;
   onSave: (newValue: string) => void;
   adCopyId?: string;
   campaignPurpose?: string;
@@ -34,6 +35,7 @@ export function EditableField({
   fieldType,
   platform,
   fieldLabel,
+  charCount,
   onSave,
   adCopyId,
   campaignPurpose,
@@ -222,7 +224,14 @@ export function EditableField({
       >
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <div className="text-xs text-muted-foreground mb-1">{fieldLabel}</div>
+            <div className="text-xs text-muted-foreground mb-1">
+              {fieldLabel}
+              {charCount !== undefined && (
+                <span className="text-orange-400 font-semibold ml-1">
+                  ({charCount} chars)
+                </span>
+              )}
+            </div>
             <div className="text-foreground">{value}</div>
           </div>
           <div className="flex items-center gap-2">

@@ -13,6 +13,8 @@ const BrandForm: React.FC<BrandFormProps> = ({ brand, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState<BrandInput>({
     name: brand?.name || '',
     website: brand?.website || '',
+    social_media_handle: brand?.social_media_handle || '',
+    practitioner_names: brand?.practitioner_names || [],
     product_urls: brand?.product_urls || [],
     technologies_features: brand?.technologies_features || '',
     brand_guidelines: brand?.brand_guidelines || {},
@@ -61,6 +63,28 @@ const BrandForm: React.FC<BrandFormProps> = ({ brand, onSubmit, onCancel }) => {
             required
             value={formData.website}
             onChange={e => setFormData({ ...formData, website: e.target.value })}
+            className="w-full bg-slate-800 text-slate-200 px-4 py-2 rounded border border-purple-600/30 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+          />
+        </InputGroup>
+
+        <InputGroup label="Social Media Handle" htmlFor="social_media_handle">
+          <input
+            id="social_media_handle"
+            type="text"
+            value={formData.social_media_handle || ''}
+            onChange={e => setFormData({ ...formData, social_media_handle: e.target.value })}
+            placeholder="@yourbrand"
+            className="w-full bg-slate-800 text-slate-200 px-4 py-2 rounded border border-purple-600/30 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
+          />
+        </InputGroup>
+
+        <InputGroup label="Practitioner Names (one per line)" htmlFor="practitioner_names">
+          <textarea
+            id="practitioner_names"
+            rows={2}
+            value={(formData.practitioner_names || []).join('\n')}
+            onChange={e => setFormData({ ...formData, practitioner_names: e.target.value.split('\n').filter(Boolean) })}
+            placeholder="Dr. Jane Smith&#10;Dr. John Doe"
             className="w-full bg-slate-800 text-slate-200 px-4 py-2 rounded border border-purple-600/30 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20"
           />
         </InputGroup>

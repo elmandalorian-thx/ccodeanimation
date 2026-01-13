@@ -47,14 +47,15 @@ const OutputSection: React.FC<OutputSectionProps> = ({
         {title}
         <FieldInfoTooltip platform={platform} fieldType={fieldType} />
       </h3>
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
         {localItems.map((item, index) => (
           <EditableField
             key={index}
             value={item}
             fieldType={fieldType}
             platform={platform}
-            fieldLabel={`${baseTitle} #${index + 1} (${item.length} chars)`}
+            fieldLabel={`${baseTitle} #${index + 1}`}
+            charCount={item.length}
             onSave={(newValue) => handleSave(index, newValue)}
             adCopyId={adCopyId}
             campaignPurpose={campaignPurpose}

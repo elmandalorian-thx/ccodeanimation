@@ -28,16 +28,16 @@ type GoogleTool = 'sitelinks' | 'keywords' | 'pagespeed' | 'schema' | 'geo' | 'c
 
 interface SidebarProps {
   onNavigate?: (view: View, subView?: string) => void;
+  currentView?: { main: View; sub?: string };
 }
 
-export function Sidebar({ onNavigate }: SidebarProps) {
+export function Sidebar({ onNavigate, currentView }: SidebarProps) {
   const { selectedBrand, clearBrand } = useBrandStore();
   const { sidebarCollapsed, toggleSidebar } = useUIStore();
   const [expandedSection, setExpandedSection] = useState<View>('ad-copy');
-  const [activeView, setActiveView] = useState<{ main: View; sub?: string }>({
-    main: 'ad-copy',
-    sub: 'generate',
-  });
+
+  // Use currentView prop if provided, otherwise fall back to default
+  const activeView = currentView || { main: 'ad-copy' as View, sub: 'generate' };
 
   if (!selectedBrand) return null;
 
@@ -50,7 +50,6 @@ export function Sidebar({ onNavigate }: SidebarProps) {
   };
 
   const handleNavigation = (main: View, sub?: string) => {
-    setActiveView({ main, sub });
     if (onNavigate) {
       onNavigate(main, sub);
     }

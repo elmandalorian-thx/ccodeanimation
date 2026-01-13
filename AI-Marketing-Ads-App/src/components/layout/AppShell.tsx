@@ -4,14 +4,15 @@ import { useUIStore } from '../../stores/uiStore';
 import { useBrandStore } from '../../stores/brandStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type View = 'brand-manager' | 'ad-copy' | 'google-tools' | null;
+type View = 'brand-manager' | 'ad-copy' | 'google-tools' | 'saved-tools' | null;
 
 interface AppShellProps {
   children: ReactNode;
   onNavigate?: (view: View, subView?: string) => void;
+  currentView?: { main: View; sub?: string };
 }
 
-export function AppShell({ children, onNavigate }: AppShellProps) {
+export function AppShell({ children, onNavigate, currentView }: AppShellProps) {
   const { sidebarCollapsed, setSidebarCollapsed } = useUIStore();
   const { selectedBrand } = useBrandStore();
 
@@ -22,7 +23,7 @@ export function AppShell({ children, onNavigate }: AppShellProps) {
   return (
     <div className="flex h-screen bg-background overflow-hidden">
       {/* Sidebar */}
-      <Sidebar onNavigate={onNavigate} />
+      <Sidebar onNavigate={onNavigate} currentView={currentView} />
 
       {/* Mobile overlay */}
       <AnimatePresence>

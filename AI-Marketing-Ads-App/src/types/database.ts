@@ -18,6 +18,8 @@ export interface Brand {
   user_id: string;
   name: string;
   website: string;
+  social_media_handle: string | null;
+  practitioner_names: string[] | null;
   product_urls: string[] | null;
   technologies_features: string | null;
   brand_guidelines: BrandGuidelines | null;
@@ -46,6 +48,8 @@ export interface AdCopy {
 export interface BrandInput {
   name: string;
   website: string;
+  social_media_handle?: string;
+  practitioner_names?: string[];
   product_urls?: string[];
   technologies_features?: string;
   brand_guidelines?: BrandGuidelines;

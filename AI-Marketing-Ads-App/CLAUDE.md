@@ -105,3 +105,13 @@ VITE_ANTHROPIC_API_KEY=your_anthropic_key
   - Strict character limit enforcement via post-processing (truncates if over limit)
   - Google Descriptions now use Title Case (first letter of each word capitalized)
   - Labels show actual character count (e.g., "Headlines #1 (28 chars)" instead of "#1")
+- **UI improvements:**
+  - Multi-column responsive grid layout for results (1-4 columns based on screen width)
+  - Neon orange character count labels for better visibility
+  - Load Ads feature: Shows latest 5 saved ads as quick-load buttons below Generate
+  - Save vs Save as New: When editing a loaded ad, shows "Save" (update) and "Save as New" buttons
+  - Sidebar active state now properly highlights the current page
+- **Brand database enhancements:**
+  - Added `social_media_handle` (TEXT) field for brand social handles
+  - Added `practitioner_names` (TEXT[]) field for clinic owners/practitioners
+  - Migration: `supabase/migrations/003_brand_social_practitioner.sql`

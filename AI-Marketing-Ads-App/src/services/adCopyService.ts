@@ -50,3 +50,25 @@ export const deleteAdCopy = async (id: string): Promise<void> => {
   const { error } = await supabase.from('ad_copies').delete().eq('id', id);
   if (error) throw error;
 };
+
+export const updateAdCopy = async (
+  id: string,
+  adCopy: AllAdCopy,
+  context: { campaignPurpose?: string; negativeKeywords?: string }
+): Promise<AdCopy> => {
+  const { data, error } = await supabase
+    .from('ad_copies')
+    .update({
+      campaign_purpose: context.campaignPurpose || null,
+      meta_copy: adCopy.meta || null,
+      google_copy: adCopy.google || null,
+      tiktok_copy: adCopy.tiktok || null,
+      generation_context: { negativeKeywords: context.negativeKeywords },
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+};

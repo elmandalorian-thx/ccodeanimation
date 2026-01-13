@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { AllAdCopy, AdCopyInput, MetaAdCopy, GoogleAdCopy, TikTokAdCopy } from '../types';
-import { Brand } from '../src/types/database';
+import { Brand, AdCopy } from '../src/types/database';
 import { generateAdCopy } from '../services/claudeService';
-import { saveAdCopy } from '../src/services/adCopyService';
+import { saveAdCopy, fetchAdCopies, updateAdCopy } from '../src/services/adCopyService';
 import { generateMetaCsvContent, generateGoogleCsvContent, generateTikTokCsvContent, generateMetaExcelCopyContent, generateGoogleExcelCopyContent, generateTikTokExcelCopyContent } from '../utils/fileUtils';
 import InputGroup from '../src/components/InputGroup';
 import OutputSection from './OutputSection';
@@ -241,6 +241,8 @@ const AdCopyForm: React.FC<AdCopyFormProps> = ({ brand }) => {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [saveName, setSaveName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [loadedAdCopy, setLoadedAdCopy] = useState<AdCopy | null>(null);
+  const [recentAdCopies, setRecentAdCopies] = useState<AdCopy[]>([]);
 
   // Auto-populate from brand context
   useEffect(() => {
@@ -251,7 +253,22 @@ const AdCopyForm: React.FC<AdCopyFormProps> = ({ brand }) => {
       additionalUrls: (brand.product_urls || []).join('\n'),
       negativeKeywords: (brand.brand_guidelines?.negativeTerms || []).join('\n'),
     }));
+    // Reset loaded ad copy when brand changes
+    setLoadedAdCopy(null);
   }, [brand]);
+
+  // Fetch recent ad copies for the brand
+  useEffect(() => {
+    const loadRecentAds = async () => {
+      try {
+        const copies = await fetchAdCopies(brand.id);
+        setRecentAdCopies(copies.slice(0, 5)); // Latest 5
+      } catch (err) {
+        console.error('Failed to fetch recent ad copies:', err);
+      }
+    };
+    loadRecentAds();
+  }, [brand.id]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -340,19 +357,63 @@ const AdCopyForm: React.FC<AdCopyFormProps> = ({ brand }) => {
     URL.revokeObjectURL(link.href);
   }, [adCopy, activeTab]);
 
+  const handleLoadAdCopy = (ad: AdCopy) => {
+    setLoadedAdCopy(ad);
+    setAdCopy({
+      meta: ad.meta_copy || undefined,
+      google: ad.google_copy || undefined,
+      tiktok: ad.tiktok_copy || undefined,
+    });
+    // Set the first available tab
+    if (ad.meta_copy) setActiveTab('meta');
+    else if (ad.google_copy) setActiveTab('google');
+    else if (ad.tiktok_copy) setActiveTab('tiktok');
+    // Populate form fields from context
+    if (ad.campaign_purpose) {
+      setInputs(prev => ({ ...prev, campaignPurpose: ad.campaign_purpose || '' }));
+    }
+    if (ad.generation_context?.negativeKeywords) {
+      setInputs(prev => ({ ...prev, negativeKeywords: ad.generation_context?.negativeKeywords || '' }));
+    }
+  };
+
   const handleSave = async () => {
     if (!adCopy || !saveName.trim()) return;
     setIsSaving(true);
     try {
-      await saveAdCopy(brand.id, saveName, adCopy, {
+      const savedAd = await saveAdCopy(brand.id, saveName, adCopy, {
         campaignPurpose: inputs.campaignPurpose,
         negativeKeywords: inputs.negativeKeywords,
       });
       setShowSaveDialog(false);
       setSaveName('');
+      setLoadedAdCopy(savedAd);
+      // Refresh recent ad copies
+      const copies = await fetchAdCopies(brand.id);
+      setRecentAdCopies(copies.slice(0, 5));
       alert('Ad copy saved successfully!');
     } catch (err: any) {
       alert(err.message || 'Failed to save ad copy');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleUpdateExisting = async () => {
+    if (!adCopy || !loadedAdCopy) return;
+    setIsSaving(true);
+    try {
+      const updatedAd = await updateAdCopy(loadedAdCopy.id, adCopy, {
+        campaignPurpose: inputs.campaignPurpose,
+        negativeKeywords: inputs.negativeKeywords,
+      });
+      setLoadedAdCopy(updatedAd);
+      // Refresh recent ad copies
+      const copies = await fetchAdCopies(brand.id);
+      setRecentAdCopies(copies.slice(0, 5));
+      alert('Ad copy updated successfully!');
+    } catch (err: any) {
+      alert(err.message || 'Failed to update ad copy');
     } finally {
       setIsSaving(false);
     }
@@ -416,6 +477,48 @@ const AdCopyForm: React.FC<AdCopyFormProps> = ({ brand }) => {
                 {isLoading ? <LoadingSpinner /> : 'Generate All'}
             </button>
             </div>
+
+            {/* Load Recent Ad Copies */}
+            {recentAdCopies.length > 0 && (
+              <div className="mt-6 pt-4 border-t border-slate-700">
+                <p className="text-sm text-slate-400 mb-3">
+                  Load Recent Ad Copy:
+                  {loadedAdCopy && (
+                    <span className="ml-2 text-cyan-400">
+                      (Editing: {loadedAdCopy.name})
+                    </span>
+                  )}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {recentAdCopies.map(ad => (
+                    <button
+                      key={ad.id}
+                      type="button"
+                      onClick={() => handleLoadAdCopy(ad)}
+                      className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                        loadedAdCopy?.id === ad.id
+                          ? 'bg-cyan-600 text-white'
+                          : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                      }`}
+                    >
+                      {ad.name}
+                    </button>
+                  ))}
+                  {loadedAdCopy && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLoadedAdCopy(null);
+                        setAdCopy(null);
+                      }}
+                      className="px-3 py-1.5 text-sm bg-slate-800 text-slate-400 rounded-md hover:bg-slate-700 hover:text-slate-300 transition-colors"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
         </form>
 
         {error && (
@@ -484,26 +587,45 @@ const AdCopyForm: React.FC<AdCopyFormProps> = ({ brand }) => {
         {showSaveDialog && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
             <div className="bg-slate-800 p-6 rounded-lg border border-purple-600 max-w-md w-full">
-              <h3 className="text-xl font-bold text-slate-200 mb-4">Save Ad Copy</h3>
+              <h3 className="text-xl font-bold text-slate-200 mb-4">
+                {loadedAdCopy ? 'Save Ad Copy' : 'Save New Ad Copy'}
+              </h3>
+              {loadedAdCopy && (
+                <p className="text-sm text-slate-400 mb-4">
+                  Currently editing: <span className="text-cyan-400">{loadedAdCopy.name}</span>
+                </p>
+              )}
               <input
                 type="text"
                 value={saveName}
                 onChange={(e) => setSaveName(e.target.value)}
-                placeholder="Enter a name for this ad copy..."
+                placeholder={loadedAdCopy ? "Enter a new name to save as copy..." : "Enter a name for this ad copy..."}
                 className="w-full bg-slate-900 text-slate-200 px-4 py-2 rounded border border-purple-600/30 mb-4 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 autoFocus
               />
-              <div className="flex gap-4">
+              <div className="flex gap-3">
+                {loadedAdCopy && (
+                  <button
+                    onClick={() => {
+                      handleUpdateExisting();
+                      setShowSaveDialog(false);
+                    }}
+                    disabled={isSaving}
+                    className="flex-1 bg-green-600 text-white py-2 rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+                  >
+                    {isSaving ? 'Saving...' : 'Save'}
+                  </button>
+                )}
                 <button
                   onClick={handleSave}
                   disabled={!saveName.trim() || isSaving}
                   className="flex-1 bg-purple-600 text-white py-2 rounded hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
                 >
-                  {isSaving ? 'Saving...' : 'Save'}
+                  {isSaving ? 'Saving...' : (loadedAdCopy ? 'Save as New' : 'Save')}
                 </button>
                 <button
                   onClick={() => setShowSaveDialog(false)}
-                  className="px-6 py-2 bg-slate-700 text-slate-300 rounded hover:bg-slate-600 font-semibold"
+                  className="px-4 py-2 bg-slate-700 text-slate-300 rounded hover:bg-slate-600 font-semibold"
                 >
                   Cancel
                 </button>

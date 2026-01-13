@@ -76,7 +76,7 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <AppShell onNavigate={handleNavigation}>
+    <AppShell onNavigate={handleNavigation} currentView={currentView}>
       <div className="relative">
         {/* Header with user info */}
         <div className="flex justify-between items-center mb-6 pb-4 border-b border-border">
