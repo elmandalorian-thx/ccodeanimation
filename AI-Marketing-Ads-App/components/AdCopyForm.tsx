@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { AllAdCopy, AdCopyInput, MetaAdCopy, GoogleAdCopy, TikTokAdCopy } from '../types';
 import { Brand } from '../src/types/database';
-import { generateAdCopy } from '../services/geminiService';
+import { generateAdCopy } from '../services/claudeService';
 import { saveAdCopy } from '../src/services/adCopyService';
 import { generateMetaCsvContent, generateGoogleCsvContent, generateTikTokCsvContent, generateMetaExcelCopyContent, generateGoogleExcelCopyContent, generateTikTokExcelCopyContent } from '../utils/fileUtils';
 import InputGroup from '../src/components/InputGroup';

@@ -22,14 +22,16 @@ For OAuth to work in production, configure in Supabase Dashboard → Authenticat
 Set these in Vercel Project Settings → Environment Variables:
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
-- `VITE_GEMINI_API_KEY`
+- `VITE_GEMINI_API_KEY` (for Google Tools)
+- `VITE_ANTHROPIC_API_KEY` (for Ad Copy generation)
 
 ## Tech Stack
 - **Frontend**: React 19, TypeScript, Vite
 - **Styling**: Tailwind CSS v3.4.19, Framer Motion
 - **State**: Zustand
 - **Database**: Supabase (PostgreSQL)
-- **AI**: Google Gemini API (gemini-2.5-flash)
+- **AI - Ad Copy**: Claude API (claude-sonnet-4-20250514)
+- **AI - Google Tools**: Google Gemini API (gemini-2.5-flash) - for search grounding
 - **Icons**: lucide-react
 
 ## Key Features
@@ -86,6 +88,7 @@ Set these in Vercel Project Settings → Environment Variables:
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_anon_key
 VITE_GEMINI_API_KEY=your_gemini_key
+VITE_ANTHROPIC_API_KEY=your_anthropic_key
 ```
 
 ## Changelog
@@ -95,4 +98,6 @@ VITE_GEMINI_API_KEY=your_gemini_key
 - Configured Supabase OAuth redirect URLs for production
 - Set Vercel root directory to `AI-Marketing-Ads-App`
 - App live at https://marketing-ads.vercel.app/
-- Added retry logic with exponential backoff for Gemini API 503 errors (3 retries, 1s/2s/4s delays)
+- Added retry logic with exponential backoff for API 503 errors (3 retries, 1s/2s/4s delays)
+- **Switched ad copy generation from Gemini to Claude** (claude-sonnet-4-20250514) for better quality
+- Google Tools still use Gemini for search grounding capabilities
