@@ -1,0 +1,50 @@
+{
+  "disabledSkills": [
+    "joker",
+    "onomastophes",
+    "instagram-curator",
+    "twitter-engager",
+    "tiktok-strategist",
+    "desktop-app-dev",
+    "mobile-app-builder",
+    "mobile-ux-optimizer",
+    "react-native-dev",
+    "content-creator",
+    "growth-hacker",
+    "model-context-protocol-mcp-expert",
+    "openapi-expert",
+    "xcode-test",
+    "playwright-test",
+    "python-expert",
+    "data-scientist",
+    "dhh-rails-style",
+    "dhh-ruby-style",
+    "kieran-rails-reviewer",
+    "andrew-kane-gem-writer",
+    "ankane-readme-writer",
+    "compound-engineering:agent-native-reviewer",
+    "compound-engineering:data-migration-expert",
+    "compound-engineering:deployment-verification-agent",
+    "compound-engineering:git-history-analyzer",
+    "compound-engineering:julik-frontend-races-reviewer",
+    "compound-engineering:xcode-test"
+  ],
+  "enabledSkills": [
+    "web-dev",
+    "frontend-developer",
+    "backend-architect",
+    "ui-designer",
+    "code-reviewer",
+    "compound-engineering:code-simplicity-reviewer",
+    "compound-engineering:security-sentinel",
+    "compound-engineering:performance-oracle"
+  ],
+  "mcpServers": {
+    "context7": {
+      "enabled": true
+    },
+    "playwright": {
+      "enabled": false
+    }
+  }
+}

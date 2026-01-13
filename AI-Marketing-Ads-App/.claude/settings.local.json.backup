@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"C:\\\\GIT Folder\\\\AI-Marketing-Ads-App\\\\src\"\" 2>/dev/null || ls -la \"C:GIT FolderAI-Marketing-Ads-App\"\")",
+      "Bash(npm install:*)",
+      "Bash(npm run dev)",
+      "Bash(claude mcp add:*)",
+      "Bash(claude mcp list:*)",
+      "Bash(claude mcp auth:*)",
+      "Bash(claude mcp --help:*)",
+      "Bash(claude mcp get supabase)",
+      "WebFetch(domain:mcp.supabase.com)",
+      "WebSearch",
+      "Bash(cat:*)",
+      "Bash(ls:*)",
+      "mcp__plugin_compound-engineering_pw__browser_snapshot"
+    ]
+  }
+}

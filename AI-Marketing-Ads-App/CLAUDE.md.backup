@@ -1,0 +1,242 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+**AI Marketing Studio** - A comprehensive AI-powered tool for generating high-converting ad copy across multiple platforms (Meta, Google, TikTok) and performing advanced SEO/GEO analysis.
+
+**Source**: Extracted from Google AI Studio export
+**See**: [IMPROVEMENT_PLAN.md](IMPROVEMENT_PLAN.md) for detailed enhancement roadmap
+
+## Tech Stack
+
+- **Framework**: React 19 + TypeScript + Vite
+- **AI Service**: Google Gemini 2.5 Pro/Flash with Google Search grounding
+- **Styling**: Tailwind CSS (inline classes, dark purple/slate theme)
+- **API Client**: `@google/genai` SDK
+- **Build Tool**: Vite 6
+
+## Quick Start
+
+```bash
+# Install dependencies
+npm install
+
+# Set up environment variables
+# Copy .env.local and add your Gemini API key
+echo "GEMINI_API_KEY=your_key_here" > .env.local
+
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+## Architecture
+
+### Core Features
+
+1. **Ad Copy Generator** ([components/AdCopyForm.tsx](components/AdCopyForm.tsx))
+   - Generates platform-specific ad copy (Meta, Google, TikTok)
+   - Accepts brand details, campaign purpose, negative keywords, images
+   - Outputs copy variations with character limits enforced
+   - Export to CSV or Excel-formatted text
+
+2. **Google Marketing Tools** ([components/GoogleTools.tsx](components/GoogleTools.tsx))
+   - **Sitelink Creator**: Generates Google Ads sitelinks from URLs
+   - **Keyword Research**: AI-powered semantic keyword expansion
+   - **PageSpeed AI**: Tech stack analysis + optimization report
+   - **Schema Audit**: Missing structured data identification
+   - **GEO Audit**: Generative Engine Optimization scorecard
+   - **Competitor Analysis**: Content gap analysis
+
+### Key Services
+
+**[services/geminiService.ts](services/geminiService.ts)** - All AI generation logic
+- `generateAdCopy()`: Multi-platform ad copy generation with structured JSON schemas
+- `generateSitelinks()`: URL analysis with Google Search grounding
+- `analyzePageSpeed()`: Performance optimization recommendations
+- `analyzeSchema()`: Schema.org markup opportunities
+- `analyzeGeo()`: AI search visibility audit
+- `performKeywordResearch()`: Semantic keyword expansion
+- `analyzeCompetitors()`: Competitive gap analysis
+
+**[utils/fileUtils.ts](utils/fileUtils.ts)** - Export utilities
+- CSV generation for all data types
+- Excel-formatted clipboard content (tab-delimited)
+- Base64 file encoding for image uploads
+
+### Component Structure
+
+```
+src/
+├── App.tsx                 # Main app with tool navigation
+├── types.ts                # TypeScript interfaces
+├── components/
+│   ├── AdCopyForm.tsx      # Ad copy generation form (250 lines)
+│   ├── GoogleTools.tsx     # Google-specific tools (663 lines - REFACTOR TARGET)
+│   ├── InputGroup.tsx      # Reusable form input wrapper
+│   ├── OutputSection.tsx   # Reusable output display
+│   └── icons.tsx           # SVG icon components
+├── services/
+│   └── geminiService.ts    # All Gemini API calls (526 lines)
+└── utils/
+    └── fileUtils.ts        # Export/file handling
+```
+
+## Development Guidelines
+
+### Adding New AI Tools
+
+1. **Define TypeScript types** in [types.ts](types.ts)
+2. **Create Gemini schema** in [services/geminiService.ts](services/geminiService.ts)
+3. **Write prompt template** following existing patterns (clear, structured instructions)
+4. **Add tool UI** in [components/GoogleTools.tsx](components/GoogleTools.tsx) or create new component
+5. **Add export handlers** in [utils/fileUtils.ts](utils/fileUtils.ts)
+
+### Prompt Engineering Best Practices
+
+From existing prompts:
+- **Be specific about character limits** (enforced via schema descriptions)
+- **Use clear formatting rules** (e.g., "Capitalize Each Word", "Max X characters")
+- **Provide examples** in schema descriptions
+- **Request structured output** (JSON with `responseMimeType` and `responseSchema`)
+- **Use Google Search grounding** when analyzing URLs (`tools: [{ googleSearch: {} }]`)
+
+### Gemini API Usage
+
+**Model Selection:**
+- `gemini-2.5-pro`: Complex ad copy generation (multi-platform)
+- `gemini-2.5-flash`: Faster tools (sitelinks, keyword research, audits)
+
+**With Google Search:**
+```typescript
+await ai.models.generateContent({
+  model: 'gemini-2.5-flash',
+  contents: { parts: [{ text: prompt }] },
+  config: {
+    tools: [{ googleSearch: {} }],
+    // Note: responseMimeType/responseSchema NOT allowed with googleSearch
+  }
+});
+```
+
+**With Structured Output:**
+```typescript
+await ai.models.generateContent({
+  model: 'gemini-2.5-pro',
+  contents: { parts: [{ text: prompt }, ...imageParts] },
+  config: {
+    responseMimeType: 'application/json',
+    responseSchema: yourSchema // Type.OBJECT with properties
+  }
+});
+```
+
+## Known Issues & Refactor Targets
+
+### High Priority
+1. **[components/GoogleTools.tsx](components/GoogleTools.tsx)** - 663 lines, needs component splitting
+2. **State management** - Repetitive useState patterns, consider custom hooks
+3. **No caching** - API calls re-run unnecessarily
+4. **No error boundaries** - App crashes on unhandled errors
+5. **Inline styles only** - No design system or reusable components
+
+### Medium Priority
+1. **No testing** - No unit/integration/e2e tests
+2. **No history/persistence** - Results lost on refresh
+3. **Limited exports** - Only CSV, no JSON/PDF/Google Ads Editor format
+4. **API key in client** - Should use backend/serverless functions
+5. **No loading progress** - Just spinner, no granular feedback
+
+See [IMPROVEMENT_PLAN.md](IMPROVEMENT_PLAN.md) for comprehensive improvement roadmap.
+
+## Code Patterns
+
+### Form Input Pattern
+```typescript
+const [input, setInput] = useState('');
+const [result, setResult] = useState<Type | null>(null);
+const [isLoading, setIsLoading] = useState(false);
+const [error, setError] = useState<string | null>(null);
+
+const handleSubmit = async () => {
+  setIsLoading(true);
+  setError(null);
+  setResult(null);
+  try {
+    const data = await apiCall(input);
+    setResult(data);
+  } catch (e: any) {
+    setError(e.message);
+  } finally {
+    setIsLoading(false);
+  }
+};
+```
+
+### Export Pattern
+```typescript
+// CSV download
+const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+const link = document.createElement('a');
+link.href = URL.createObjectURL(blob);
+link.download = 'filename.csv';
+document.body.appendChild(link);
+link.click();
+document.body.removeChild(link);
+URL.revokeObjectURL(link.href);
+
+// Clipboard copy (Excel format)
+navigator.clipboard.writeText(tabDelimitedContent);
+```
+
+## Environment Variables
+
+Required in `.env.local`:
+```bash
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+Access via: `process.env.API_KEY` (note: different name in code vs file)
+
+## Common Tasks
+
+### Run the app locally
+```bash
+npm run dev
+```
+
+### Build for production
+```bash
+npm run build
+# Output in dist/
+```
+
+### Add a new ad platform
+1. Add types to [types.ts](types.ts) (`export interface NewPlatformAdCopy`)
+2. Update `AllAdCopy` interface
+3. Create schema in [services/geminiService.ts](services/geminiService.ts)
+4. Write prompt generation function
+5. Add to `generateAdCopy()` function
+6. Create output component in [components/AdCopyForm.tsx](components/AdCopyForm.tsx)
+7. Add export utilities in [utils/fileUtils.ts](utils/fileUtils.ts)
+
+### Add a new Google tool
+1. Add types if needed
+2. Create service function in [services/geminiService.ts](services/geminiService.ts)
+3. Add UI tab/section in [components/GoogleTools.tsx](components/GoogleTools.tsx)
+4. Follow existing state management pattern
+5. Add export handlers if applicable
+
+## Resources
+
+- [Google AI Studio](https://ai.studio/apps/drive/1HuNykP59qpudKIvfOeezZ3tgBvixn_eZ) - Original app
+- [Gemini API Docs](https://ai.google.dev/gemini-api/docs)
+- [Schema.org](https://schema.org/) - For schema audit feature
+- [IMPROVEMENT_PLAN.md](IMPROVEMENT_PLAN.md) - Detailed enhancement roadmap

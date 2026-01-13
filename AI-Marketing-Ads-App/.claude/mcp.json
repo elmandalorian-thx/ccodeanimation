@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp-server"],
+      "disabled": false
+    },
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=ebzsmqkokehfulilbnzk",
+      "disabled": false
+    },
+    "playwright": {
+      "disabled": true
+    }
+  }
+}
