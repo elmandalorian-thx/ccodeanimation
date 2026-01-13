@@ -9,10 +9,12 @@ import AdCopyForm from './components/AdCopyForm';
 import AdCopyManager from './components/adcopy/AdCopyManager';
 import GoogleTools from './components/GoogleTools';
 import { SavedToolResults } from './src/components/google-tools/SavedToolResults';
+import { GeoSuite } from './src/components/geo-suite';
+import { SeoSuite } from './src/components/seo-suite';
 import { LoadingSpinner } from './components/icons';
 import './src/index.css';
 
-type View = 'brand-manager' | 'ad-copy' | 'google-tools' | 'saved-tools' | null;
+type View = 'brand-manager' | 'ad-copy' | 'google-tools' | 'saved-tools' | 'geo-suite' | 'seo-suite' | null;
 
 const AppContent: React.FC = () => {
   const { user, loading, signOut } = useAuth();
@@ -70,6 +72,12 @@ const AppContent: React.FC = () => {
       case 'saved-tools':
         return <SavedToolResults initialFilter={sub as any} />;
 
+      case 'geo-suite':
+        return <GeoSuite />;
+
+      case 'seo-suite':
+        return <SeoSuite />;
+
       default:
         return <AdCopyForm brand={selectedBrand} />;
     }
@@ -87,6 +95,8 @@ const AppContent: React.FC = () => {
               {currentView.main === 'ad-copy' && currentView.sub === 'saved' && 'Saved Ad Copies'}
               {currentView.main === 'google-tools' && 'Google Marketing Tools'}
               {currentView.main === 'saved-tools' && 'Saved Tool Results'}
+              {currentView.main === 'geo-suite' && 'GEO Intelligence'}
+              {currentView.main === 'seo-suite' && 'SEO Intelligence'}
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
               {selectedBrand.name}

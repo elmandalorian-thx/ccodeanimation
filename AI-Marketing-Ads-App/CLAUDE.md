@@ -38,9 +38,19 @@ Set these in Vercel Project Settings → Environment Variables:
 1. Brand management (create, edit, select)
 2. Multi-platform ad copy generation (Meta, Google, TikTok)
 3. Google Tools suite (Sitelinks, Keywords, PageSpeed, Schema, GEO, Competitors)
-4. Editable fields with personalized AI suggestions
-5. Edit history tracking for ML-based learning
-6. Auto-save functionality for tool results
+4. **GEO Intelligence Suite** - Generative Engine Optimization analysis with:
+   - 6-dimension scoring (Content Depth, Entity Coverage, Q&A, Semantic Richness, Citation Potential)
+   - AI Platform visibility tracking (Google SGE, ChatGPT, Perplexity, Bing Copilot, Claude)
+   - Entity mapping, content gap analysis, and prioritized action items
+   - File upload with guidance for deep analysis
+5. **SEO & Schema Intelligence Suite** - Comprehensive SEO toolkit with:
+   - Multi-competitor comparison dashboard (up to 5 competitors)
+   - Schema markup auditor (validates existing JSON-LD)
+   - Schema generator (8 types: LocalBusiness, Product, Organization, Article, FAQPage, Service, MedicalBusiness, Event)
+   - Keyword gap and content gap analysis
+6. Editable fields with personalized AI suggestions
+7. Edit history tracking for ML-based learning
+8. Auto-save functionality for tool results
 
 ## File Structure
 ```
@@ -50,10 +60,15 @@ Set these in Vercel Project Settings → Environment Variables:
     /layout          - Homepage, Sidebar, AppShell
     /brands          - BrandCard, BrandForm
     /google-tools    - Individual tool components
+    /geo-suite       - GEO Intelligence module (GeoSuite, GeoDashboard, GeoAnalyzer, etc.)
+    /seo-suite       - SEO Intelligence module (SeoSuite, CompetitorDashboard, SchemaGenerator, etc.)
+    /ui              - Shared UI components (ScoreGauge, ActionItemCard)
   /services          - API & database services
   /stores            - Zustand state management (brandStore, uiStore, cacheStore)
-  /types             - TypeScript type definitions
+  /types             - TypeScript type definitions (including geo.ts, seo.ts)
   /hooks             - Custom React hooks (useToolResults)
+/supabase
+  /migrations        - Database migrations (004_geo_seo_tables.sql)
 ```
 
 ## Development Guidelines
@@ -92,6 +107,47 @@ VITE_ANTHROPIC_API_KEY=your_anthropic_key
 ```
 
 ## Changelog
+
+### 2026-01-13
+- **GEO Intelligence Suite (New Module)**
+  - Full GEO analysis with 6-dimension scoring system
+  - AI platform visibility tracking for 5 major platforms
+  - Entity coverage analysis with type classification
+  - Content gap identification with competitor insights
+  - Prioritized action items with impact/effort ratings
+  - File upload support with guided instructions
+  - Dashboard with ScoreGauge visualizations
+
+- **SEO & Schema Intelligence Suite (New Module)**
+  - Multi-competitor analysis dashboard (up to 5 competitors)
+  - Keyword gap and content gap analysis
+  - Technical SEO comparison
+  - Schema markup auditor with validation
+  - Schema generator supporting 8 types:
+    - LocalBusiness, Product, Organization, Article
+    - FAQPage, Service, MedicalBusiness, Event
+  - Live JSON-LD preview with copy-to-clipboard
+  - File upload with step-by-step export guides
+
+- **UI Enhancements**
+  - Load Recent Ad Copy section redesigned with neon/gradient styling
+  - Cyan glow labels with `drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]`
+  - Purple-to-pink gradient buttons with hover scale effects
+  - Active state uses cyan-to-purple gradient
+
+- **Shared Components**
+  - `ScoreGauge` - Animated circular score display with auto-color coding
+  - `ActionItemCard` - Priority-based action items with status tracking
+
+- **Database**
+  - Migration: `004_geo_seo_tables.sql`
+  - Tables: `geo_analyses`, `competitor_analyses`, `schema_audits`
+  - Full RLS policies for user data isolation
+
+- **Navigation**
+  - Sidebar updated with GEO Intelligence and SEO Intelligence sections
+  - PRO badges with gradient styling for premium modules
+  - New icons: Globe, LayoutDashboard, FileCode, Wand2
 
 ### 2026-01-12
 - Initial deployment to GitHub and Vercel

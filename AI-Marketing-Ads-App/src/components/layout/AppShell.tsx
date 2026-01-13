@@ -4,7 +4,7 @@ import { useUIStore } from '../../stores/uiStore';
 import { useBrandStore } from '../../stores/brandStore';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type View = 'brand-manager' | 'ad-copy' | 'google-tools' | 'saved-tools' | null;
+type View = 'brand-manager' | 'ad-copy' | 'google-tools' | 'saved-tools' | 'geo-suite' | 'seo-suite' | null;
 
 interface AppShellProps {
   children: ReactNode;

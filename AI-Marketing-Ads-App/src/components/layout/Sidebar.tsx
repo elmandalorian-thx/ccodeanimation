@@ -20,10 +20,14 @@ import {
   Users,
   ExternalLink,
   Archive,
+  Globe,
+  LayoutDashboard,
+  FileCode,
+  Wand2,
 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 
-type View = 'brand-manager' | 'ad-copy' | 'google-tools' | 'saved-tools' | null;
+type View = 'brand-manager' | 'ad-copy' | 'google-tools' | 'saved-tools' | 'geo-suite' | 'seo-suite' | null;
 type GoogleTool = 'sitelinks' | 'keywords' | 'pagespeed' | 'schema' | 'geo' | 'competitors';
 
 interface SidebarProps {
@@ -332,6 +336,129 @@ export function Sidebar({ onNavigate, currentView }: SidebarProps) {
                     >
                       <Archive className="w-3.5 h-3.5" />
                       <span>View All Results</span>
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* GEO Intelligence Section */}
+            <div className="mb-1">
+              <button
+                onClick={() => handleSectionClick('geo-suite')}
+                className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md hover:bg-secondary transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4" />
+                  <span>GEO Intelligence</span>
+                  <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-cyan-400 rounded border border-cyan-500/30">
+                    PRO
+                  </span>
+                </div>
+                <ChevronRight
+                  className={`w-4 h-4 transition-transform ${
+                    expandedSection === 'geo-suite' ? 'rotate-90' : ''
+                  }`}
+                />
+              </button>
+
+              <AnimatePresence>
+                {expandedSection === 'geo-suite' && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden ml-4 mt-1"
+                  >
+                    <button
+                      onClick={() => handleNavigation('geo-suite', 'analyze')}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors ${
+                        isActive('geo-suite', 'analyze')
+                          ? 'bg-primary text-primary-foreground'
+                          : 'hover:bg-secondary'
+                      }`}
+                    >
+                      <Target className="w-3.5 h-3.5" />
+                      <span>Run Analysis</span>
+                    </button>
+                    <button
+                      onClick={() => handleNavigation('geo-suite', 'dashboard')}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors ${
+                        isActive('geo-suite', 'dashboard')
+                          ? 'bg-primary text-primary-foreground'
+                          : 'hover:bg-secondary'
+                      }`}
+                    >
+                      <LayoutDashboard className="w-3.5 h-3.5" />
+                      <span>Dashboard</span>
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* SEO Intelligence Section */}
+            <div className="mb-1">
+              <button
+                onClick={() => handleSectionClick('seo-suite')}
+                className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md hover:bg-secondary transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <Search className="w-4 h-4" />
+                  <span>SEO Intelligence</span>
+                  <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-400 rounded border border-purple-500/30">
+                    PRO
+                  </span>
+                </div>
+                <ChevronRight
+                  className={`w-4 h-4 transition-transform ${
+                    expandedSection === 'seo-suite' ? 'rotate-90' : ''
+                  }`}
+                />
+              </button>
+
+              <AnimatePresence>
+                {expandedSection === 'seo-suite' && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden ml-4 mt-1"
+                  >
+                    <button
+                      onClick={() => handleNavigation('seo-suite', 'competitors')}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors ${
+                        isActive('seo-suite', 'competitors')
+                          ? 'bg-primary text-primary-foreground'
+                          : 'hover:bg-secondary'
+                      }`}
+                    >
+                      <BarChart3 className="w-3.5 h-3.5" />
+                      <span>Competitor Analysis</span>
+                    </button>
+                    <button
+                      onClick={() => handleNavigation('seo-suite', 'schema-audit')}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors ${
+                        isActive('seo-suite', 'schema-audit')
+                          ? 'bg-primary text-primary-foreground'
+                          : 'hover:bg-secondary'
+                      }`}
+                    >
+                      <FileCode className="w-3.5 h-3.5" />
+                      <span>Schema Auditor</span>
+                    </button>
+                    <button
+                      onClick={() => handleNavigation('seo-suite', 'schema-generate')}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors ${
+                        isActive('seo-suite', 'schema-generate')
+                          ? 'bg-primary text-primary-foreground'
+                          : 'hover:bg-secondary'
+                      }`}
+                    >
+                      <Wand2 className="w-3.5 h-3.5" />
+                      <span>Schema Generator</span>
                     </button>
                   </motion.div>
                 )}

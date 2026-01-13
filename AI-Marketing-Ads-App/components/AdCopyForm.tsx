@@ -478,28 +478,37 @@ const AdCopyForm: React.FC<AdCopyFormProps> = ({ brand }) => {
             </button>
             </div>
 
-            {/* Load Recent Ad Copies */}
+            {/* Load Recent Ad Copies - Enhanced */}
             {recentAdCopies.length > 0 && (
-              <div className="mt-6 pt-4 border-t border-slate-700">
-                <p className="text-sm text-slate-400 mb-3">
-                  Load Recent Ad Copy:
-                  {loadedAdCopy && (
-                    <span className="ml-2 text-cyan-400">
-                      (Editing: {loadedAdCopy.name})
-                    </span>
-                  )}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {recentAdCopies.map(ad => (
+              <div className="mt-6 pt-4 border-t border-purple-500/30">
+                {/* Neon Label with Glow */}
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
+                  <p className="text-sm font-semibold text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
+                    Load Recent Ad Copy
+                    {loadedAdCopy && (
+                      <span className="ml-2 text-orange-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.5)]">
+                        (Editing: {loadedAdCopy.name})
+                      </span>
+                    )}
+                  </p>
+                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
+                </div>
+
+                {/* Gradient Buttons with Hover Effects */}
+                <div className="flex flex-wrap gap-3">
+                  {recentAdCopies.map((ad, index) => (
                     <button
                       key={ad.id}
                       type="button"
                       onClick={() => handleLoadAdCopy(ad)}
-                      className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
-                        loadedAdCopy?.id === ad.id
-                          ? 'bg-cyan-600 text-white'
-                          : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                      }`}
+                      className={`
+                        px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300
+                        ${loadedAdCopy?.id === ad.id
+                          ? 'bg-gradient-to-r from-cyan-500 to-purple-500 text-white shadow-lg shadow-cyan-500/25'
+                          : 'bg-gradient-to-r from-purple-600/80 to-pink-600/80 text-white hover:from-purple-500 hover:to-pink-500 hover:shadow-lg hover:shadow-purple-500/25 hover:scale-105'
+                        }
+                      `}
                     >
                       {ad.name}
                     </button>
@@ -511,9 +520,9 @@ const AdCopyForm: React.FC<AdCopyFormProps> = ({ brand }) => {
                         setLoadedAdCopy(null);
                         setAdCopy(null);
                       }}
-                      className="px-3 py-1.5 text-sm bg-slate-800 text-slate-400 rounded-md hover:bg-slate-700 hover:text-slate-300 transition-colors"
+                      className="px-4 py-2 text-sm font-medium rounded-lg bg-slate-800/80 text-slate-300 border border-slate-600 hover:bg-slate-700 hover:border-cyan-500/50 transition-all"
                     >
-                      Clear
+                      ✕ Clear
                     </button>
                   )}
                 </div>
