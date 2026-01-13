@@ -3,6 +3,27 @@
 ## Project Overview
 React 19 + TypeScript + Vite web application for generating AI-powered marketing ad copy using Google Gemini API and Supabase database.
 
+## Deployment
+
+### Live URLs
+- **Production**: https://marketing-ads.vercel.app/
+- **GitHub Repository**: https://github.com/elmandalorian-thx/Marketing-Ads
+
+### Hosting
+- **Platform**: Vercel (auto-deploys from `main` branch)
+- **Root Directory**: `AI-Marketing-Ads-App` (configured in Vercel settings)
+
+### Supabase Configuration
+For OAuth to work in production, configure in Supabase Dashboard → Authentication → URL Configuration:
+- **Site URL**: `https://marketing-ads.vercel.app`
+- **Redirect URLs**: `https://marketing-ads.vercel.app/**`
+
+### Vercel Environment Variables
+Set these in Vercel Project Settings → Environment Variables:
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- `VITE_GEMINI_API_KEY`
+
 ## Tech Stack
 - **Frontend**: React 19, TypeScript, Vite
 - **Styling**: Tailwind CSS v3.4.19, Framer Motion
@@ -60,9 +81,17 @@ React 19 + TypeScript + Vite web application for generating AI-powered marketing
 }
 ```
 
-## Environment Variables
+## Environment Variables (Local Development)
 ```
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_anon_key
 VITE_GEMINI_API_KEY=your_gemini_key
 ```
+
+## Changelog
+
+### 2026-01-12
+- Initial deployment to GitHub and Vercel
+- Configured Supabase OAuth redirect URLs for production
+- Set Vercel root directory to `AI-Marketing-Ads-App`
+- App live at https://marketing-ads.vercel.app/
