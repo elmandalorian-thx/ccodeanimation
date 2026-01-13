@@ -3,6 +3,32 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { AdCopyInput, AllAdCopy, MetaAdCopy, GoogleAdCopy, TikTokAdCopy, SitelinkData, KeywordResearchData } from '../types';
 import { fileToBase64 } from '../utils/fileUtils';
 
+// Retry helper with exponential backoff for 503 errors
+const withRetry = async <T>(
+  fn: () => Promise<T>,
+  maxRetries = 3,
+  baseDelay = 1000
+): Promise<T> => {
+  let lastError: Error | null = null;
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error: any) {
+      lastError = error;
+      const isRetryable = error?.message?.includes('503') ||
+                          error?.message?.includes('overloaded') ||
+                          error?.message?.includes('UNAVAILABLE');
+      if (!isRetryable || attempt === maxRetries - 1) {
+        throw error;
+      }
+      const delay = baseDelay * Math.pow(2, attempt);
+      console.log(`API overloaded, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  throw lastError;
+};
+
 // --- META ADS ---
 const metaAdCopySchema = {
   type: Type.OBJECT,
@@ -235,33 +261,33 @@ export const generateAdCopy = async (inputs: AdCopyInput, type: 'meta' | 'google
   if (type === 'meta' || type === 'all') {
     const metaPrompt = generateMetaPrompt(inputs);
     generationPromises.push(
-      ai.models.generateContent({
+      withRetry(() => ai.models.generateContent({
         model,
         contents: { parts: [{ text: metaPrompt }, ...imageParts] },
         config: { responseMimeType: 'application/json', responseSchema: metaAdCopySchema }
-      }).then(response => ({ type: 'meta', data: parseJsonResponse(response.text) as MetaAdCopy }))
+      })).then(response => ({ type: 'meta', data: parseJsonResponse(response.text) as MetaAdCopy }))
     );
   }
 
   if (type === 'google' || type === 'all') {
     const googlePrompt = generateGooglePrompt(inputs);
     generationPromises.push(
-      ai.models.generateContent({
+      withRetry(() => ai.models.generateContent({
         model,
         contents: { parts: [{ text: googlePrompt }, ...imageParts] },
         config: { responseMimeType: 'application/json', responseSchema: googleAdCopySchema }
-      }).then(response => ({ type: 'google', data: parseJsonResponse(response.text) as GoogleAdCopy }))
+      })).then(response => ({ type: 'google', data: parseJsonResponse(response.text) as GoogleAdCopy }))
     );
   }
 
   if (type === 'tiktok' || type === 'all') {
     const tiktokPrompt = generateTikTokPrompt(inputs);
     generationPromises.push(
-      ai.models.generateContent({
+      withRetry(() => ai.models.generateContent({
         model,
         contents: { parts: [{ text: tiktokPrompt }, ...imageParts] },
         config: { responseMimeType: 'application/json', responseSchema: tiktokAdCopySchema }
-      }).then(response => ({ type: 'tiktok', data: parseJsonResponse(response.text) as TikTokAdCopy }))
+      })).then(response => ({ type: 'tiktok', data: parseJsonResponse(response.text) as TikTokAdCopy }))
     );
   }
   
@@ -320,19 +346,17 @@ export const generateSitelinks = async (urls: string[]): Promise<SitelinkData[]>
     ]
     `;
 
-    const response = await ai.models.generateContent({
+    const response = await withRetry(() => ai.models.generateContent({
         model,
         contents: { parts: [{ text: prompt }] },
         config: {
             tools: [{ googleSearch: {} }],
-            // responseMimeType: 'application/json' // Not allowed with googleSearch
         }
-    });
+    }));
 
     const text = response.text || "";
-    // Clean potential markdown blocks if the model disobeys
     const cleanJson = text.replace(/```json|```/g, '').trim();
-    
+
     try {
         return JSON.parse(cleanJson) as SitelinkData[];
     } catch (e) {
@@ -368,13 +392,13 @@ export const analyzePageSpeed = async (url: string): Promise<string> => {
     Be specific. If it uses WordPress, suggest specific plugins. If it uses React, suggest code splitting, etc.
     `;
 
-    const response = await ai.models.generateContent({
+    const response = await withRetry(() => ai.models.generateContent({
         model,
         contents: { parts: [{ text: prompt }] },
         config: {
             tools: [{ googleSearch: {} }]
         }
-    });
+    }));
 
     return response.text || "No analysis generated.";
 };
@@ -405,13 +429,13 @@ export const analyzeSchema = async (url: string): Promise<string> => {
        - Aside from schema, give 2-3 tips on how to structure the text content (headings, entity clarity) to be better understood by AI models.
     `;
 
-    const response = await ai.models.generateContent({
+    const response = await withRetry(() => ai.models.generateContent({
         model,
         contents: { parts: [{ text: prompt }] },
         config: {
             tools: [{ googleSearch: {} }]
         }
-    });
+    }));
 
     return response.text || "No schema analysis generated.";
 };
@@ -456,13 +480,13 @@ export const analyzeGeo = async (url: string): Promise<string> => {
     Make the tone professional, forward-thinking, and specific to the AI era of search.
     `;
 
-    const response = await ai.models.generateContent({
+    const response = await withRetry(() => ai.models.generateContent({
         model,
         contents: { parts: [{ text: prompt }] },
         config: {
             tools: [{ googleSearch: {} }]
         }
-    });
+    }));
 
     return response.text || "No analysis generated.";
 };
@@ -503,17 +527,17 @@ export const performKeywordResearch = async (seedKeywords: string): Promise<Keyw
     ]
     `;
 
-    const response = await ai.models.generateContent({
+    const response = await withRetry(() => ai.models.generateContent({
         model,
         contents: { parts: [{ text: prompt }] },
         config: {
             tools: [{ googleSearch: {} }],
         }
-    });
+    }));
 
     const text = response.text || "";
     const cleanJson = text.replace(/```json|```/g, '').trim();
-    
+
     try {
         return JSON.parse(cleanJson) as KeywordResearchData[];
     } catch (e) {
@@ -552,13 +576,13 @@ export const analyzeCompetitors = async (brandUrl: string, competitorUrls: strin
         *   Give 3 specific, actionable recommendations for the Target Brand to outrank these competitors in Generative results.
     `;
 
-    const response = await ai.models.generateContent({
+    const response = await withRetry(() => ai.models.generateContent({
         model,
         contents: { parts: [{ text: prompt }] },
         config: {
             tools: [{ googleSearch: {} }]
         }
-    });
+    }));
 
     return response.text || "No analysis generated.";
 };

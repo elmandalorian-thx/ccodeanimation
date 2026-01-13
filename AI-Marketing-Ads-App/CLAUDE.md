@@ -95,3 +95,4 @@ VITE_GEMINI_API_KEY=your_gemini_key
 - Configured Supabase OAuth redirect URLs for production
 - Set Vercel root directory to `AI-Marketing-Ads-App`
 - App live at https://marketing-ads.vercel.app/
+- Added retry logic with exponential backoff for Gemini API 503 errors (3 retries, 1s/2s/4s delays)
