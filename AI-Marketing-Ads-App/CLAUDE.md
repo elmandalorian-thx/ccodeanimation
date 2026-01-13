@@ -101,3 +101,7 @@ VITE_ANTHROPIC_API_KEY=your_anthropic_key
 - Added retry logic with exponential backoff for API 503 errors (3 retries, 1s/2s/4s delays)
 - **Switched ad copy generation from Gemini to Claude** (claude-sonnet-4-20250514) for better quality
 - Google Tools still use Gemini for search grounding capabilities
+- **Ad copy output improvements:**
+  - Strict character limit enforcement via post-processing (truncates if over limit)
+  - Google Descriptions now use Title Case (first letter of each word capitalized)
+  - Labels show actual character count (e.g., "Headlines #1 (28 chars)" instead of "#1")

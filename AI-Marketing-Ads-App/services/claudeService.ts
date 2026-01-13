@@ -98,7 +98,8 @@ Your task is to generate a comprehensive set of Google Ads assets based on the p
     *   Max 60 characters.
     *   **Crucial: Capitalize Each Word.**
 5.  **Descriptions (10x):**
-    *   Max 90 characters.
+    *   Max 90 characters. THIS IS A STRICT LIMIT - do not exceed.
+    *   **Crucial: Capitalize Each Word.**
     *   **Must be written in complementary pairs.** (e.g., Description 1 and 2 work together, 3 and 4 work together, etc.).
     *   Follow Google's best practices for punctuation. **Do not use dashes.**
 6.  **Callout Extensions (25x):**
@@ -188,6 +189,38 @@ const parseJsonResponse = (text: string): any => {
   }
 };
 
+// --- POST-PROCESSING HELPERS ---
+
+// Title case helper - capitalizes first letter of each word
+const toTitleCase = (str: string): string =>
+  str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+
+// Truncate string to max length (strict enforcement)
+const truncateToLimit = (str: string, limit: number): string =>
+  str.length > limit ? str.substring(0, limit).trim() : str;
+
+// Process Google ad copy with strict character limits
+const processGoogleAdCopy = (copy: GoogleAdCopy): GoogleAdCopy => ({
+  headlines: copy.headlines.map(h => truncateToLimit(h, 30)),
+  longHeadlines: copy.longHeadlines.map(h => truncateToLimit(h, 90)),
+  shortHeadlines: copy.shortHeadlines.map(h => truncateToLimit(h, 60)),
+  descriptions: copy.descriptions.map(d => truncateToLimit(toTitleCase(d), 90)),
+  callouts: copy.callouts.map(c => truncateToLimit(c, 25)),
+  keywords: copy.keywords // no character limit for keywords
+});
+
+// Process Meta ad copy with strict character limits
+const processMetaAdCopy = (copy: MetaAdCopy): MetaAdCopy => ({
+  primaryTexts: copy.primaryTexts.map(t => truncateToLimit(t, 125)),
+  headlines: copy.headlines.map(h => truncateToLimit(h, 40)),
+  descriptions: copy.descriptions.map(d => truncateToLimit(d, 30))
+});
+
+// Process TikTok ad copy with strict character limits
+const processTikTokAdCopy = (copy: TikTokAdCopy): TikTokAdCopy => ({
+  texts: copy.texts.map(t => truncateToLimit(t, 100))
+});
+
 // Convert file to base64 and get media type
 const prepareImageForClaude = async (file: File): Promise<Anthropic.ImageBlockParam> => {
   const base64Data = await fileToBase64(file);
@@ -246,19 +279,22 @@ export const generateAdCopy = async (
   if (type === 'meta' || type === 'all') {
     const prompt = generateMetaPrompt(inputs);
     const response = await generateWithClaude(prompt);
-    allAdCopy.meta = parseJsonResponse(response) as MetaAdCopy;
+    const parsed = parseJsonResponse(response) as MetaAdCopy;
+    allAdCopy.meta = processMetaAdCopy(parsed);
   }
 
   if (type === 'google' || type === 'all') {
     const prompt = generateGooglePrompt(inputs);
     const response = await generateWithClaude(prompt);
-    allAdCopy.google = parseJsonResponse(response) as GoogleAdCopy;
+    const parsed = parseJsonResponse(response) as GoogleAdCopy;
+    allAdCopy.google = processGoogleAdCopy(parsed);
   }
 
   if (type === 'tiktok' || type === 'all') {
     const prompt = generateTikTokPrompt(inputs);
     const response = await generateWithClaude(prompt);
-    allAdCopy.tiktok = parseJsonResponse(response) as TikTokAdCopy;
+    const parsed = parseJsonResponse(response) as TikTokAdCopy;
+    allAdCopy.tiktok = processTikTokAdCopy(parsed);
   }
 
   return allAdCopy;

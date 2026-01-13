@@ -38,6 +38,9 @@ const OutputSection: React.FC<OutputSectionProps> = ({
     return null;
   }
 
+  // Extract base title without character limit info (e.g., "Headlines (30 chars)" -> "Headlines")
+  const baseTitle = title.replace(/\s*\([^)]*\)\s*$/, '');
+
   return (
     <div>
       <h3 className="text-xl font-semibold text-cyan-400 mb-3 flex items-center">
@@ -51,7 +54,7 @@ const OutputSection: React.FC<OutputSectionProps> = ({
             value={item}
             fieldType={fieldType}
             platform={platform}
-            fieldLabel={`${title} #${index + 1}`}
+            fieldLabel={`${baseTitle} #${index + 1} (${item.length} chars)`}
             onSave={(newValue) => handleSave(index, newValue)}
             adCopyId={adCopyId}
             campaignPurpose={campaignPurpose}
