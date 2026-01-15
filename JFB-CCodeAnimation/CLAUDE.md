@@ -1,60 +1,94 @@
 # CCodeAnimation
 
-A fun CLI companion that animates while you code with Claude. Watch a bouncing ball navigate through mill-like platforms, with fireworks celebrating task completion!
+A fun CLI companion that animates **live** while you code with Claude! Watch a bouncing ball navigate through platforms as you prompt, with fireworks celebrating task completion.
 
 ## Features
 
-- **Bouncing Ball Physics**: A ball that perpetually falls through the animation panel
-- **Mill Wheel Platforms**: Rotating platforms that appear as coding phases complete
-- **Multiple Patterns**: Staircase, zigzag, cascade, and more platform patterns
-- **Progress Tracking**: Real-time token count and phase completion display
-- **Celebration Fireworks**: Colorful fireworks when coding is complete
+- **Live Tracking**: Hooks into your Claude Code session to animate in real-time
+- **Super Bouncy Ball**: Enhanced physics with trails and particle effects
+- **Moving Platforms**: Blocks drift sideways with wave patterns
+- **Real-time Stats**: Tracks prompts, tokens, and tool usage
+- **Celebration Fireworks**: Colorful explosions when you complete tasks
+
+## Quick Start
+
+### 1. Start the live animation (in a separate terminal)
+```bash
+cd "C:/GIT Folder/JFB-CCodeAnimation"
+npm run live
+```
+
+### 2. The animation will react to your Claude Code session!
+- Each prompt adds blocks
+- Tool calls create particles
+- Responses add more action
 
 ## Project Structure
 
 ```
 src/
-  index.js        # CLI entry point
-  animation.js    # Main animation engine and renderer
-  ball.js         # Ball physics with gravity and collisions
-  mill.js         # Mill wheel platform generator
-  fireworks.js    # Celebration fireworks system
-  tracker.js      # Phase and token tracking
+  live.js         # Live animation with event tracking
+  send-event.js   # CLI to send events
+  index.js        # Demo animation (standalone)
+  animation.js    # Animation engine
+  ball.js         # Ball physics
+  mill.js         # Platform generator
+  fireworks.js    # Celebration effects
+  tracker.js      # Stats tracking
+
+hooks/            # Hook scripts for Claude Code
+.claude/          # Claude Code settings with hooks
 ```
 
 ## Commands
 
 ```bash
-# Run the animation demo
+# Run live animation (tracks your session)
+npm run live
+
+# Run standalone demo
 npm start
 
-# Install globally (optional)
-npm link
-ccode-anim
+# Send manual events
+npm run event prompt
+npm run event tool_start '{"tool": "Read"}'
+npm run event complete    # Triggers fireworks!
+npm run event bounce      # Manual bounce
 ```
 
 ## How It Works
 
-The animation runs in a split-screen layout:
-- **Left panel**: Shows current phase, token count, and progress bar
-- **Right panel**: Animated ball falling through mill-like platforms
+1. **Hooks**: Claude Code hooks call `send-event.js` on prompts/tools
+2. **Event File**: Events are written to `events.json`
+3. **Animation**: `live.js` reads events and updates the display
+4. **Physics**: Ball bounces off moving platforms with particle effects
 
-As coding progresses:
-1. New platforms appear with each phase
-2. The ball bounces off platforms like a mill wheel
-3. Platforms slowly descend and rotate
-4. On completion, the ball falls and fireworks celebrate!
+## Event Types
+
+| Event | Trigger | Effect |
+|-------|---------|--------|
+| `prompt` | User submits prompt | Adds 3 blocks + cyan particles |
+| `tool_start` | Tool begins | Adds 1 block |
+| `tool_end` | Tool finishes | Green particles |
+| `response` | Claude responds | Adds 2 blocks + yellow particles |
+| `complete` | Task done | 🎆 Fireworks! |
+| `bounce` | Manual | Extra bouncy ball |
 
 ## Configuration
 
-The animation is designed to be lightweight and run alongside Claude Code sessions. Adjust timing in `animation.js`:
+Settings are in `.claude/settings.local.json`. Hooks automatically trigger on:
+- `PreToolUse` - Before each tool runs
+- `PostToolUse` - After each tool completes
+- `UserPromptSubmit` - When you send a message
 
-- `frameInterval`: Animation speed (default: 66ms = ~15 FPS)
-- `gravity`: Ball fall speed in `ball.js`
-- `platformSpeed`: How fast platforms move in `mill.js`
+## Troubleshooting
 
-## Integration Ideas
+**Animation not updating?**
+- Make sure hooks are configured in `.claude/settings.local.json`
+- Check that `events.json` is being written to
+- Restart Claude Code to reload hooks
 
-- Hook into Claude Code events to trigger phases
-- Connect to actual token usage metrics
-- Add custom celebration messages
+**Ball moves too fast/slow?**
+- Adjust physics constants in `live.js`:
+  - Gravity: `this.ball.vy += 0.12`
+  - Bounce: `this.ball.vy * 1.1`

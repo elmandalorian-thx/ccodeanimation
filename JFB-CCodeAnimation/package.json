@@ -1,16 +1,19 @@
 {
   "name": "ccode-animation",
-  "version": "1.0.0",
-  "description": "A fun CLI companion that animates while you code with Claude",
+  "version": "2.0.0",
+  "description": "A fun CLI companion that animates live while you code with Claude",
   "main": "src/index.js",
   "bin": {
-    "ccode-anim": "./src/index.js"
+    "ccode-anim": "./src/index.js",
+    "ccode-live": "./src/live.js",
+    "ccode-event": "./src/send-event.js"
   },
   "scripts": {
     "start": "node src/index.js",
-    "demo": "node src/demo.js"
+    "live": "node src/live.js",
+    "event": "node src/send-event.js"
   },
-  "keywords": ["claude", "cli", "animation", "coding", "companion"],
+  "keywords": ["claude", "cli", "animation", "coding", "companion", "live"],
   "author": "",
   "license": "MIT",
   "type": "module"

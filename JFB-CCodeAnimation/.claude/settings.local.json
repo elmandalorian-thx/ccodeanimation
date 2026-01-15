@@ -2,15 +2,48 @@
   "permissions": {
     "allow": [
       "Bash(gh repo view:*)",
-      "Bash(git -C \"C:/GIT Folder/JFB-CCodeAnimation\" remote:*)",
-      "Bash(git -C \"C:/GIT Folder/JFB-CCodeAnimation\" log --oneline -10)",
-      "Bash(git -C \"C:/GIT Folder/JFB-CCodeAnimation\" ls-tree --name-only -r HEAD)",
-      "Bash(git -C \"C:/GIT Folder/JFB-CCodeAnimation\" status)",
-      "Bash(git -C \"C:/GIT Folder/JFB-CCodeAnimation\" remote set-url:*)",
-      "Bash(git -C \"C:/GIT Folder/JFB-CCodeAnimation\" add CLAUDE.md .claude/)",
-      "Bash(git -C \"C:/GIT Folder/JFB-CCodeAnimation\" commit -m \"$\\(cat <<''EOF''\nInitial commit: Add CLAUDE.md and project setup\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
-      "Bash(git -C \"C:/GIT Folder/JFB-CCodeAnimation\" push -u origin main)",
-      "Bash(git -C \"C:/GIT Folder/JFB-CCodeAnimation\" add .)"
+      "Bash(git:*)",
+      "Bash(node:*)",
+      "Bash(cd:*)",
+      "Bash(git -C \"C:/GIT Folder/JFB-CCodeAnimation\" commit -m \"$\\(cat <<''EOF''\nfeat: Add live session tracking with enhanced physics\n\n- Live animation tracks Claude Code sessions via hooks\n- Super bouncy ball with trail effects\n- Blocks move sideways with wave patterns\n- Particle effects on tool calls and prompts\n- Fireworks on task completion\n- Event-based architecture with events.json\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"C:/GIT Folder/JFB-CCodeAnimation/src/send-event.js\" tool_start \"{\\\"tool\\\": \\\"$CLAUDE_TOOL_NAME\\\"}\"",
+            "timeout": 1000
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"C:/GIT Folder/JFB-CCodeAnimation/src/send-event.js\" tool_end",
+            "timeout": 1000
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"C:/GIT Folder/JFB-CCodeAnimation/src/send-event.js\" prompt",
+            "timeout": 1000
+          }
+        ]
+      }
     ]
   }
 }
